@@ -4,7 +4,7 @@
 
 <script setup>
 const { VITE_APP_TITLE } = import.meta.env;
-import { computed, ref } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useFullscreen } from "@vueuse/core";
 import { useAuthStore } from "../../../store/authStore";
@@ -21,6 +21,7 @@ const { isFullscreen, toggle } = useFullscreen();
 
 const isSearchVisible = ref(false);
 const searchQuery = ref('');
+const searchInput = ref(null);
 
 const linkQuery = computed(() => {
 	const { query } = route;
@@ -41,6 +42,10 @@ const toggleSearch = () => {
   isSearchVisible.value = !isSearchVisible.value;
   if (!isSearchVisible.value) {
     searchQuery.value = '';
+  } else {
+    nextTick(() => {
+      searchInput.value.focus();
+    });
   }
 };
 </script>
