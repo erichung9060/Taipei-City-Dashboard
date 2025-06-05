@@ -4,8 +4,8 @@
 
 <script setup>
 const { VITE_APP_TITLE } = import.meta.env;
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { computed, ref, watch, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useFullscreen } from "@vueuse/core";
 import { useAuthStore } from "../../../store/authStore";
 import { useDialogStore } from "../../../store/dialogStore";
@@ -14,9 +14,14 @@ import UserSettings from "../../dialogs/UserSettings.vue";
 import ContributorsList from "../../dialogs/ContributorsList.vue";
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const dialogStore = useDialogStore();
 const { isFullscreen, toggle } = useFullscreen();
+
+const isSearchVisible = ref(false);
+const searchQuery = ref('');
+const searchInput = ref(null);
 
 const linkQuery = computed(() => {
 	const { query } = route;
@@ -24,6 +29,25 @@ const linkQuery = computed(() => {
 	const cityQuery = query.city ? `&city=${query.city}` : '';
 	return `${indexQuery}${cityQuery}`;
 });
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ name: 'dashboard', query: { search_target: searchQuery.value.trim() } });
+    searchQuery.value = '';
+    isSearchVisible.value = false;
+  }
+};
+
+const toggleSearch = () => {
+  isSearchVisible.value = !isSearchVisible.value;
+  if (!isSearchVisible.value) {
+    searchQuery.value = '';
+  } else {
+    nextTick(() => {
+      searchInput.value.focus();
+    });
+  }
+};
 </script>
 
 <template>
@@ -75,6 +99,27 @@ const linkQuery = computed(() => {
       </router-link>
     </div>
     <div class="navbar-user">
+
+      <div class="navbar-search">
+        <button
+          class="search-button"
+          @click="toggleSearch"
+        >
+          <span>search</span>
+        </button>
+      </div>
+	  
+	  <div v-if="isSearchVisible" class="search-input-container">
+	    <input
+	      v-model="searchQuery"
+	      type="text"
+	      placeholder="搜尋組件..."
+	      @keyup.enter="handleSearch"
+	      @blur="isSearchVisible = false"
+	      ref="searchInput"
+	    />
+	  </div>
+
       <button
         v-if="!(authStore.isMobileDevice && authStore.isNarrowDevice)"
         class="hide-if-mobile"
@@ -84,7 +129,7 @@ const linkQuery = computed(() => {
           isFullscreen ? "fullscreen_exit" : "fullscreen"
         }}</span>
       </button>
-      <div class="navbar-user-info">
+	  <div class="navbar-user-info">
         <button><span>info</span></button>
         <ul>
           <li>
@@ -237,6 +282,50 @@ const linkQuery = computed(() => {
 		display: flex;
 		align-items: center;
 
+		.navbar-search {
+			position: relative;
+
+			.search-button {
+				display: flex;
+				align-items: center;
+				padding: 2px 4px;
+				border-radius: 4px;
+				transition: background-color 0.25s;
+
+				&:hover {
+					background-color: var(--color-complement-text);
+				}
+
+				span {
+					font-family: var(--font-icon);
+					font-size: calc(var(--font-l) * var(--font-to-icon));
+				}
+			}
+
+			.search-input-container {
+				position: absolute;
+				right: 0;
+				top: 100%;
+				margin-top: 8px;
+				z-index: 100;
+
+				input {
+					width: 250px;
+					padding: 8px 12px;
+					border: 1px solid var(--color-border);
+					border-radius: 4px;
+					background-color: var(--color-component-background);
+					color: var(--color-text);
+					font-size: var(--font-m);
+
+					&:focus {
+						outline: none;
+						border-color: var(--color-highlight);
+					}
+				}
+			}
+		}
+
 		li a,
 		button {
 			display: flex;
@@ -325,6 +414,15 @@ const linkQuery = computed(() => {
 				display: flex;
 			}
 		}
+	}
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
 	}
 }
 </style>
