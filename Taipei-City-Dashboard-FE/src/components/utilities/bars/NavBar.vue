@@ -284,7 +284,6 @@ const toggleSearch = () => {
 
 		.navbar-search {
 			position: relative;
-			margin-right: var(--font-m);
 
 			.search-button {
 				display: flex;
@@ -322,19 +321,6 @@ const toggleSearch = () => {
 					&:focus {
 						outline: none;
 						border-color: var(--color-highlight);
-					}
-				}
-
-				.search-loading {
-					position: absolute;
-					right: 12px;
-					top: 50%;
-					transform: translateY(-50%);
-					
-					span {
-						font-family: var(--font-icon);
-						font-size: calc(var(--font-m) * var(--font-to-icon));
-						animation: spin 1s linear infinite;
 					}
 				}
 			}
