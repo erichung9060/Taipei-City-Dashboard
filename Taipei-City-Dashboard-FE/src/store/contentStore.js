@@ -164,7 +164,7 @@ export const useContentStore = defineStore("content", {
 			});
 
 			if (onlyDashboard) return;
-
+			
 			// 2-1. If the current path is /dashboard or /mapview, redirect to the first dashboard
 			if (!this.currentDashboard.index) {
 				// Find the first available dashboard
@@ -732,7 +732,11 @@ export const useContentStore = defineStore("content", {
 				authStore.currentPath === "dashboard" ||
 				authStore.currentPath === "mapview"
 			) {
-				this.setDashboards();
+				if (this.currentDashboard.index === "search") {
+					this.setDashboards(true);
+				} else {
+					this.setDashboards();
+				}
 			}
 		},
 		// 6. Call this function to unfavorite a component.
@@ -752,7 +756,11 @@ export const useContentStore = defineStore("content", {
 				authStore.currentPath === "dashboard" ||
 				authStore.currentPath === "mapview"
 			) {
-				this.setDashboards();
+				if (this.currentDashboard.index === "search") {
+					this.setDashboards(true);
+				} else {
+					this.setDashboards();
+				}
 			}
 		},
 		/*
