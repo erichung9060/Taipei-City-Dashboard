@@ -170,11 +170,7 @@ router.beforeEach((to) => {
 		to.path.toLowerCase() === "/mapview"
 	) {
 		contentStore.clearEditDashboard();
-		if(to.query.search_target){
-			contentStore.setSearchComponent(to.query.search_target);
-		}else{
-			contentStore.setRouteParams(to.path, to.query.index, to.query.city);
-		}
+		contentStore.setRouteParams(to.path, to.query.index, to.query.city);
 	} else if (
 		to.path.toLowerCase() === "/component" ||
 		to.name === "component-info"
