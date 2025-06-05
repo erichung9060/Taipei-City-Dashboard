@@ -73,6 +73,30 @@ export const useContentStore = defineStore("content", {
 		setMapLayerData(index, component) {
 			this.mapLayers[index] = component;
 		},
+		async setSearchComponent(target){
+			this.currentDashboard.mode = "/dashboard";
+			this.currentDashboard.city = "metrotaipei";
+			this.currentDashboard.index = "search";
+
+			this.currentDashboard.name = "搜尋結果：";
+			this.currentDashboard.icon = "info";
+			
+			if (this.dashboards.size === 0) {
+				this.setDashboards(true);
+			}
+			
+			// find target components
+			this.cityDashboard.components = [];
+			const response = await http.get(`/component/`);
+			(response.data.data).forEach(component => {
+				if (component.name.toLowerCase().includes(target.toLowerCase())) {
+					this.cityDashboard.components.push(component);
+				}
+			});
+
+			this.filterCurrentDashboardContent();
+			this.setCurrentDashboardAllChartData();
+		},
 		/* Steps in adding content to the application (/dashboard or /mapview) */
 		// 1. Check the current path and execute actions based on the current path
 		setRouteParams(mode, index, city) {
@@ -224,7 +248,7 @@ export const useContentStore = defineStore("content", {
 				}
 				return;
 			}
-			
+
 			// Set the current dashboard info
 			this.currentDashboard.name = currentDashboardInfo.name;
 			this.currentDashboard.icon = currentDashboardInfo.icon;
